@@ -11,18 +11,23 @@ public class TransActions {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String transactionName;
-    private double transaction;
+    private double transactionAmmount;
+    private double dopositBeforeTransaction;
+    private double dopositAfterTransaction;
     private boolean sendingOrreciving;
 
     public TransActions(){
 
     }
 
-    public TransActions(String transactionName, double transaction, boolean sendingOrreciving) {
+    public TransActions(String transactionName, double transactionAmmount, double dopositBeforeTransaction, double dopositAfterTransaction, boolean sendingOrreciving) {
         this.transactionName = transactionName;
-        this.transaction = transaction;
+        this.transactionAmmount = transactionAmmount;
+        this.dopositBeforeTransaction = dopositBeforeTransaction;
+        this.dopositAfterTransaction = dopositAfterTransaction;
         this.sendingOrreciving = sendingOrreciving;
     }
+
 
     public Long getId() {
         return id;
@@ -40,12 +45,28 @@ public class TransActions {
         this.transactionName = transactionName;
     }
 
-    public double getTransaction() {
-        return transaction;
+    public double getTransactionAmmount() {
+        return transactionAmmount;
     }
 
-    public void setTransaction(double transaction) {
-        this.transaction = transaction;
+    public void setTransactionAmmount(double transactionAmmount) {
+        this.transactionAmmount = transactionAmmount;
+    }
+
+    public double getDopositBeforeTransaction() {
+        return dopositBeforeTransaction;
+    }
+
+    public void setDopositBeforeTransaction(double dopositBeforeTransaction) {
+        this.dopositBeforeTransaction = dopositBeforeTransaction;
+    }
+
+    public double getDopositAfterTransaction() {
+        return dopositAfterTransaction;
+    }
+
+    public void setDopositAfterTransaction(double dopositAfterTransaction) {
+        this.dopositAfterTransaction = dopositAfterTransaction;
     }
 
     public boolean isSendingOrreciving() {

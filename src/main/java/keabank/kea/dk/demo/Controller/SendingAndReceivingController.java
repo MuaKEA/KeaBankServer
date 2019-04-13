@@ -22,21 +22,28 @@ public class SendingAndReceivingController {
 
 
     @PostMapping("/sendmoneyToOtherAccount")
-    public ResponseEntity Sendmoney(@RequestParam(name = "Email") String Email, @RequestParam(name = "fromAccount") String Faccount, @RequestParam(name = "ToAccount") String toAccount, @RequestParam(name = "value") Double value, @RequestParam(name = "sendingorReciving") boolean sendingorrecing) {
+    public ResponseEntity Sendmoney(@RequestParam(name = "Email") String Email,@RequestParam(name = "TranceActionName") String TranceActionName, @RequestParam(name = "fromAccount") String Faccount, @RequestParam(name = "ToAccount") String toAccount, @RequestParam(name = "value") Double value, @RequestParam(name = "sendingorReciving") boolean sendingorrecing) {
 
         UserLogin user = userLoginRepo.findByEmail(Email);
         UserLogin user2 = userLoginRepo.findByEmail(Email);
 
+//        private String transactionName;
+//        private double transactionAmmount;
+//        private double dopositBeforeTransaction;
+//        private double dopositAfterTransaction;
+//        private boolean sendingOrreciving;
+
+
         for (int i = 0; i < user.getAccountsList().size(); i++) {
             if (user.getAccountsList().get(i).getAccount().equals(Faccount)) {
-                user.getAccountsList().get(i).getTransActions().add(new TransActions("sendingmoney", value, sendingorrecing));
+                user.getAccountsList().get(i).getTransActions().add(new TransActions(TranceActionName,value,user.getAccountsList().get(i).getCurrentdeposit(),remowedicimals(user.getAccountsList().get(i).getCurrentdeposit()-value), sendingorrecing));
                 user.getAccountsList().get(i).setCurrentdeposit(remowedicimals(user.getAccountsList().get(i).getCurrentdeposit() - value));
             }
         }
 
             for (int j = 0; j <user2.getAccountsList().size() ; j++) {
                 if(user2.getAccountsList().get(j).getAccount().equals(toAccount)){
-                    user2.getAccountsList().get(j).getTransActions().add(new TransActions("sendingmoney",value,false));
+                    user2.getAccountsList().get(j).getTransActions().add(new TransActions(TranceActionName,value,user2.getAccountsList().get(j).getCurrentdeposit(),remowedicimals(user2.getAccountsList().get(j).getCurrentdeposit()+value),false));
                     user2.getAccountsList().get(j).setCurrentdeposit(remowedicimals(user.getAccountsList().get(j).getCurrentdeposit()+value));
 
                 }
