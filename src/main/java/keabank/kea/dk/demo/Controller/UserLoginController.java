@@ -49,29 +49,19 @@ public class UserLoginController {
         Optional<UserLogin>user=userLoginRepo.findByEmailAndPassword(username,password);
 
         if (user.isPresent()){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+
+
+            return new ResponseEntity(HttpStatus.OK);
 
 
         }
 
-        return new ResponseEntity(HttpStatus.ACCEPTED);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 
 
     }
 
 
-
-
-
-
-    @GetMapping("/printall")
-    public ResponseEntity printall(){
-
-
-        return new ResponseEntity(userLoginRepo.findAll(),HttpStatus.ACCEPTED);
-
-
-    }
 
 
 public double generatenumber(){
