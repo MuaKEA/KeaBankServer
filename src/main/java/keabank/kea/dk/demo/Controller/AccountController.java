@@ -22,10 +22,10 @@ public class AccountController {
 
 
     @PostMapping("/newAccount")
-    public ResponseEntity newAccount(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String accountname){
+    public ResponseEntity newAccount(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String accountname,@RequestParam(name = "AccountType") String AccountType){
         List<TransActions> transActions= new ArrayList<>();
         UserLogin user=userLoginRepo.findByEmail(Email);
-        Accounts accounts= new Accounts(accountname,0.0,transActions);
+        Accounts accounts= new Accounts(accountname,AccountType,0.0,transActions);
         user.getAccountsList().add(accounts);
         userLoginRepo.save(user);
 
@@ -36,6 +36,13 @@ public class AccountController {
     public ResponseEntity getaccounts(@RequestParam(name = "Email") String Email){
 
         UserLogin user= userLoginRepo.findByEmail(Email);
+
+        return new ResponseEntity(user,HttpStatus.OK);
+    }
+
+    @GetMapping("all")
+    public ResponseEntity getallaccounts(){
+       Iterable<UserLogin> user= userLoginRepo.findAll();
 
         return new ResponseEntity(user,HttpStatus.OK);
     }

@@ -10,6 +10,7 @@ public class UserLogin {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String fullName;
+    private String Cpr;
     private String email;
     private String password;
     @OneToMany(cascade = {CascadeType.ALL})
@@ -19,9 +20,10 @@ public class UserLogin {
 
     }
 
-    public UserLogin(String fullName, String email, String password, List<Accounts> accountsList) {
+    public UserLogin(String fullName, String email,String Cpr, String password, List<Accounts> accountsList) {
         this.fullName = fullName;
         this.email = email;
+        this.Cpr=Cpr;
         this.password = password;
         this.accountsList = accountsList;
     }
@@ -64,5 +66,13 @@ public class UserLogin {
 
     public void setAccountsList(List<Accounts> accountsList) {
         this.accountsList = accountsList;
+    }
+
+    public String getCpr() {
+        return Cpr;
+    }
+
+    public void setCpr(String cpr) {
+        Cpr = cpr;
     }
 }

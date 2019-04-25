@@ -29,12 +29,12 @@ public class UserLoginController {
 
 
     @PostMapping("/createuser")
-    public ResponseEntity saveLogin(@RequestParam( name="fullname") String fullname,@RequestParam( name="username") String username, @RequestParam(name = "password") String password){
+    public ResponseEntity saveLogin(@RequestParam( name="fullname") String fullname,@RequestParam( name="username") String username,@RequestParam( name="Cpr") String Cpr, @RequestParam(name = "password") String password){
         List<TransActions> transActions= new ArrayList<>();
         List<Accounts> accountsArrayList= new ArrayList<>();
 
-        accountsArrayList.add(new Accounts("Keabank",generatenumber(),transActions));
-        UserLogin login= new UserLogin(fullname,username,password,accountsArrayList);
+        accountsArrayList.add(new Accounts("Keabank","standart",generatenumber(),transActions));
+        UserLogin login= new UserLogin(fullname,username,Cpr,password,accountsArrayList);
 
         userLoginRepo.save(login);
 
@@ -60,8 +60,6 @@ public class UserLoginController {
 
 
     }
-
-
 
 
 public double generatenumber(){

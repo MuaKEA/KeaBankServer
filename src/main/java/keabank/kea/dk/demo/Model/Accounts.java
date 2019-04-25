@@ -14,6 +14,7 @@ public class Accounts {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String Account;
+    private String accounttype;
     private double Currentdeposit;
     @OneToMany(cascade = {CascadeType.ALL})
     List<TransActions> transActions;
@@ -24,10 +25,13 @@ public class Accounts {
 
     }
 
-    public Accounts(String account, double currentdeposit, List<TransActions> transActions) {
-        Account = account;
-        Currentdeposit = currentdeposit;
+    public Accounts(String account,String accounttype, double currentdeposit, List<TransActions> transActions) {
+        this.Account = account;
+        this.accounttype=accounttype;
+        this.Currentdeposit = currentdeposit;
         this.transActions = transActions;
+
+
     }
 
     public Long getId() {
@@ -60,5 +64,13 @@ public class Accounts {
 
     public void setTransActions(List<TransActions> transActions) {
         this.transActions = transActions;
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype;
     }
 }
