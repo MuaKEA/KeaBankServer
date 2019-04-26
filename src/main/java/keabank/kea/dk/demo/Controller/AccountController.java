@@ -49,14 +49,14 @@ public class AccountController {
 
 
  @GetMapping("AccountTransfers")
-    public ResponseEntity<List<TransActions>> getallAccountTranactions(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String Accountname){
+    public ResponseEntity getallAccountTranactions(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String Accountname){
        UserLogin user= userLoginRepo.findByEmail(Email);
-      List<TransActions> transActions;
+      Accounts transActions;
 
      for (int i = 0; i <user.getAccountsList().size() ; i++) {
 
          if (user.getAccountsList().get(i).getAccount().equals(Accountname)){
-             transActions=user.getAccountsList().get(i).getTransActions();
+             transActions=user.getAccountsList().get(i);
              return new ResponseEntity<>(transActions,HttpStatus.OK);
 
          }
