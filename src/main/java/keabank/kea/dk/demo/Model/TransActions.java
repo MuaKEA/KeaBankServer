@@ -14,17 +14,21 @@ public class TransActions {
     private double transactionAmmount;
     private double dopositBeforeTransaction;
     private double dopositAfterTransaction;
+    private String date;
+    private String time;
     private boolean sendingOrreciving;
 
     public TransActions(){
 
     }
 
-    public TransActions(String transactionName, double transactionAmmount, double dopositBeforeTransaction, double dopositAfterTransaction, boolean sendingOrreciving) {
+    public TransActions(String transactionName, double transactionAmmount, double dopositBeforeTransaction, double dopositAfterTransaction,String date,String time, boolean sendingOrreciving) {
         this.transactionName = transactionName;
         this.transactionAmmount = transactionAmmount;
         this.dopositBeforeTransaction = dopositBeforeTransaction;
         this.dopositAfterTransaction = dopositAfterTransaction;
+        this.time=time;
+        this.date=date;
         this.sendingOrreciving = sendingOrreciving;
     }
 
@@ -75,5 +79,21 @@ public class TransActions {
 
     public void setSendingOrreciving(boolean sendingOrreciving) {
         this.sendingOrreciving = sendingOrreciving;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

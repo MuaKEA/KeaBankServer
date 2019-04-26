@@ -22,7 +22,7 @@ public class AccountController {
 
 
     @PostMapping("/newAccount")
-    public ResponseEntity newAccount(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String accountname,@RequestParam(name = "AccountType") String AccountType){
+    public ResponseEntity<String> newAccount(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String accountname, @RequestParam(name = "AccountType") String AccountType){
         List<TransActions> transActions= new ArrayList<>();
         UserLogin user=userLoginRepo.findByEmail(Email);
         Accounts accounts= new Accounts(accountname,AccountType,0.0,transActions);
@@ -30,21 +30,38 @@ public class AccountController {
         userLoginRepo.save(user);
 
 
-        return new ResponseEntity("senior", HttpStatus.OK);
+        return new ResponseEntity<>("senior", HttpStatus.OK);
     }
     @GetMapping("/getaccounts")
-    public ResponseEntity getaccounts(@RequestParam(name = "Email") String Email){
+    public ResponseEntity<UserLogin> getaccounts(@RequestParam(name = "Email") String Email){
 
         UserLogin user= userLoginRepo.findByEmail(Email);
 
-        return new ResponseEntity(user,HttpStatus.OK);
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
     @GetMapping("all")
-    public ResponseEntity getallaccounts(){
+    public ResponseEntity<Iterable<UserLogin>> getallaccounts(){
        Iterable<UserLogin> user= userLoginRepo.findAll();
 
-        return new ResponseEntity(user,HttpStatus.OK);
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
+
+ @GetMapping("AccountTransfers")
+    public ResponseEntity<List<TransActions>> getallAccountTranactions(@RequestParam(name = "Email") String Email, @RequestParam(name = "Accountname") String Accountname){
+       UserLogin user= userLoginRepo.findByEmail(Email);
+      List<TransActions> transActions;
+
+     for (int i = 0; i <user.getAccountsList().size() ; i++) {
+
+         if (user.getAccountsList().get(i).getAccount().equals(Accountname)){
+             transActions=user.getAccountsList().get(i).getTransActions();
+             return new ResponseEntity<>(transActions,HttpStatus.OK);
+
+         }
+     }
+
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+ }
 }
