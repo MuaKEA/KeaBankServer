@@ -1,5 +1,6 @@
 package keabank.kea.dk.demo.Controller;
 
+import keabank.kea.dk.demo.Model.AccountNumberAndRegistration;
 import keabank.kea.dk.demo.Model.Accounts;
 import keabank.kea.dk.demo.Model.TransActions;
 import keabank.kea.dk.demo.Model.UserLogin;
@@ -26,14 +27,16 @@ public class UserLoginController {
     Iaccountsrepository iaccountsrepository;
     @Autowired
     ITransActions iTransActions;
+    private int RegistrationNumber=4444;
 
 
     @PostMapping("/createuser")
     public ResponseEntity saveLogin(@RequestParam( name="fullname") String fullname,@RequestParam( name="username") String username,@RequestParam( name="Cpr") String Cpr, @RequestParam(name = "password") String password){
         List<TransActions> transActions= new ArrayList<>();
         List<Accounts> accountsArrayList= new ArrayList<>();
+        AccountNumberAndRegistration accountNumberAndRegistration = new AccountNumberAndRegistration(getregistrationNumber(),RegistrationNumber);
 
-        accountsArrayList.add(new Accounts("Keabank","standart",generatenumber(),transActions));
+        accountsArrayList.add(new Accounts("Keabank","standart",generatenumber(),transActions,accountNumberAndRegistration));
         UserLogin login= new UserLogin(fullname,username,Cpr,password,accountsArrayList);
 
         userLoginRepo.save(login);
@@ -42,6 +45,13 @@ public class UserLoginController {
         return new ResponseEntity(login,HttpStatus.OK);
 
 
+    }
+
+    private int getregistrationNumber() {
+     Random rand = new Random();
+      String number = String.valueOf(rand.nextInt((999999 - 100000) + 1) + 100000);
+      number = RegistrationNumber + number;
+     return Integer.parseInt(number);
     }
 
     @GetMapping("/loginvalidation")
