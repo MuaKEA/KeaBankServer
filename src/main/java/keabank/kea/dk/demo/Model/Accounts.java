@@ -1,11 +1,7 @@
 package keabank.kea.dk.demo.Model;
 
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.*;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -17,9 +13,9 @@ public class Accounts {
     private String accounttype;
     private double Currentdeposit;
     @OneToMany(cascade = {CascadeType.ALL})
-    List<TransActions> transActions;
-    @OneToOne
-    AccountNumberAndRegistration accountNumberAndRegistration;
+    private List<TransActions> transActions;
+    @OneToOne (cascade = {CascadeType.ALL})
+    private AccountNumberAndRegistration accountNumberAndRegistration;
 
     public Accounts() {
 

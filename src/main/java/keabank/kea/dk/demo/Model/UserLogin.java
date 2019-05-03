@@ -28,6 +28,10 @@ public class UserLogin {
         this.accountsList = accountsList;
     }
 
+    public UserLogin(String cpr) {
+        Cpr = cpr;
+    }
+
     public Long getId() {
         return id;
     }
@@ -75,4 +79,15 @@ public class UserLogin {
     public void setCpr(String cpr) {
         Cpr = cpr;
     }
-}
+
+
+    }
+
+
+
+
+
+
+
+
+

@@ -11,14 +11,14 @@ public class AccountNumberAndRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private int accountNumber;
-    private int registrationNumber;
+    private Long accountNumber;
+    private Long registrationNumber;
 
     public AccountNumberAndRegistration(){
 
     }
 
-    public AccountNumberAndRegistration(int accountNumber, int registrationNumber) {
+    public AccountNumberAndRegistration(Long accountNumber, Long registrationNumber) {
         this.accountNumber = accountNumber;
         this.registrationNumber = registrationNumber;
     }
@@ -31,19 +31,19 @@ public class AccountNumberAndRegistration {
         this.id = id;
     }
 
-    public int getAccountNumber() {
+    public Long getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(int accountNumber) {
+    public void setAccountNumber(Long accountNumber) {
         this.accountNumber = accountNumber;
     }
 
-    public int getRegistrationNumber() {
+    public Long getRegistrationNumber() {
         return registrationNumber;
     }
 
-    public void setRegistrationNumber(int registrationNumber) {
+    public void setRegistrationNumber(Long registrationNumber) {
         this.registrationNumber = registrationNumber;
     }
 }
