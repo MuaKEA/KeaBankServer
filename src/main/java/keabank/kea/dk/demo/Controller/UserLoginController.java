@@ -55,7 +55,7 @@ public class UserLoginController {
 
 
 
-    @GetMapping("/loginvalidation")
+    @PostMapping("/loginvalidation")
     public ResponseEntity uservalidation(@RequestParam( name="username") String username, @RequestParam(name = "password") String password){
         Optional<UserLogin>user=userLoginRepo.findByEmailAndPassword(username,password);
         System.out.println(user.isPresent());

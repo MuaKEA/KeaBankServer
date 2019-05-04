@@ -32,6 +32,14 @@ public class TransActions {
         this.sendingOrreciving = sendingOrreciving;
     }
 
+    public TransActions(String transactionName, double transactionAmmount, double dopositBeforeTransaction, double dopositAfterTransaction,String date, boolean sendingOrreciving) {
+        this.transactionName = transactionName;
+        this.transactionAmmount = transactionAmmount;
+        this.dopositBeforeTransaction = dopositBeforeTransaction;
+        this.dopositAfterTransaction = dopositAfterTransaction;
+        this.date=date;
+        this.sendingOrreciving = sendingOrreciving;
+    }
 
     public Long getId() {
         return id;

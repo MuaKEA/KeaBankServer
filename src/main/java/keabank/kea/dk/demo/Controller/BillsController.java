@@ -29,15 +29,16 @@ public class BillsController {
     @GetMapping("/checkbillsexist")
     public ResponseEntity getBill(@RequestParam(name = "digits")String obligatoryDigits, @RequestParam(name = "accountnumber") Long accountNumber,
                                   @RequestParam(name = "registrationNumber") Long registrationNumber){
-     Optional<Bills> bills=billsRepo.findByObligatoryDigitsAndAccountNumberAndRegistrationNumber(obligatoryDigits, accountNumber, registrationNumber);
+
+
+        System.out.println(obligatoryDigits +" " +  accountNumber + " " + "" + registrationNumber);
+
+     Optional<Bills> bills=billsRepo.findByObligatoryDigitsAndAccountNumberAndRegistrationNumber( "+"+obligatoryDigits, accountNumber, registrationNumber);
+
 
                 if(bills.isPresent()){
-                    System.out.println("bills is present");
                     return new ResponseEntity(HttpStatus.OK);
-
-
                 }
-
 
                 return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -82,10 +83,10 @@ public class BillsController {
             if(userLogin.getAccountsList().get(i).getAccount().equals(Faccount)){
                 userLogin.getAccountsList().get(i).getTransActions().add(new TransActions(TranceActionName,value,userLogin.getAccountsList().get(i).getCurrentdeposit(),userLogin.getAccountsList().get(i).getCurrentdeposit()-value,date, time ,sendingorrecing));
                 userLogin.getAccountsList().get(i).setCurrentdeposit(remowedicimals(userLogin.getAccountsList().get(i).getCurrentdeposit() - value));
-
                 userLoginRepo.save(userLogin);
             }
         }
+
      return new ResponseEntity<>(HttpStatus.OK);
     }
 

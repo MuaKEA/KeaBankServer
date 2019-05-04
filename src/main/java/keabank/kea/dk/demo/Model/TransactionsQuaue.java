@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
 
 @Entity
 public class TransactionsQuaue {
@@ -16,18 +17,18 @@ public class TransactionsQuaue {
     private Long TocountNumber;
     private Long TOgistrationNumber;
     private double transactionAmmount;
-    private String date;
+    private LocalDate date;
 
     public TransactionsQuaue(){
 
 
     }
 
-    public TransactionsQuaue(String transactionName, Long fromaccountNumber, Long fromregistrationNumber, Long tocountNumber, Long TOgistrationNumber, double transactionAmmount, String date) {
+    public TransactionsQuaue(String transactionName, Long fromaccountNumber, Long fromregistrationNumber, Long tocountNumber, Long TOgistrationNumber, double transactionAmmount, LocalDate date) {
         this.transactionName = transactionName;
-        FromaccountNumber = fromaccountNumber;
-        FromregistrationNumber = fromregistrationNumber;
-        TocountNumber = tocountNumber;
+        this.FromaccountNumber = fromaccountNumber;
+        this.FromregistrationNumber = fromregistrationNumber;
+        this.TocountNumber = tocountNumber;
         this.TOgistrationNumber = TOgistrationNumber;
         this.transactionAmmount = transactionAmmount;
         this.date = date;
@@ -90,11 +91,11 @@ public class TransactionsQuaue {
         this.transactionAmmount = transactionAmmount;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 }
