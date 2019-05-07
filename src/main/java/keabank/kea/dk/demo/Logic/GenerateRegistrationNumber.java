@@ -5,7 +5,7 @@ import java.util.Random;
 public class GenerateRegistrationNumber {
 
 
-    public static Long getregistrationNumber(Long RegistrationNumber ) {
+    public static Long getaccountnumber(Long RegistrationNumber ) {
         long x = 999999L;
         long y = 100000L;
         Random r = new Random();

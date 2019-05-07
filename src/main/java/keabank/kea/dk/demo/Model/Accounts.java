@@ -12,22 +12,24 @@ public class Accounts {
     private String Account;
     private String accounttype;
     private double Currentdeposit;
+    private long registrationnumber;
+    private long accountNumber;
+
     @OneToMany(cascade = {CascadeType.ALL})
     private List<TransActions> transActions;
-    @OneToOne (cascade = {CascadeType.ALL})
-    private AccountNumberAndRegistration accountNumberAndRegistration;
 
     public Accounts() {
 
 
     }
 
-    public Accounts(String account, String accounttype, double currentdeposit, List<TransActions> transActions, AccountNumberAndRegistration accountNumberAndRegistration) {
-        Account = account;
+    public Accounts(String account, String accounttype, double currentdeposit, long registrationnumber, Long accountNumber, List<TransActions> transActions) {
+        this.Account = account;
         this.accounttype = accounttype;
-        Currentdeposit = currentdeposit;
+        this.Currentdeposit = currentdeposit;
+        this. registrationnumber = registrationnumber;
+        this.accountNumber = accountNumber;
         this.transActions = transActions;
-        this.accountNumberAndRegistration = accountNumberAndRegistration;
     }
 
     public Long getId() {
@@ -62,19 +64,27 @@ public class Accounts {
         Currentdeposit = currentdeposit;
     }
 
+    public Long getregistrationnumber() {
+        return registrationnumber;
+    }
+
+    public void setregistrationnumber(Long registrationnumber) {
+        this.registrationnumber = registrationnumber;
+    }
+
+    public Long getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(Long accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
     public List<TransActions> getTransActions() {
         return transActions;
     }
 
     public void setTransActions(List<TransActions> transActions) {
         this.transActions = transActions;
-    }
-
-    public AccountNumberAndRegistration getAccountNumberAndRegistration() {
-        return accountNumberAndRegistration;
-    }
-
-    public void setAccountNumberAndRegistration(AccountNumberAndRegistration accountNumberAndRegistration) {
-        this.accountNumberAndRegistration = accountNumberAndRegistration;
     }
 }
