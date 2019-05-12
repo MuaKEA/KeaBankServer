@@ -4,7 +4,6 @@ import keabank.kea.dk.demo.Model.*;
 import keabank.kea.dk.demo.Repositories.ITransactionsQuaue;
 import keabank.kea.dk.demo.Repositories.Iaccountsrepository;
 import keabank.kea.dk.demo.Repositories.UserLoginRepo;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

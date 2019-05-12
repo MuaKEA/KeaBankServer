@@ -1,12 +1,9 @@
 package keabank.kea.dk.demo.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
-public class Bills {
+public class Bill {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -16,13 +13,13 @@ public class Bills {
     private Long accountNumber;
     private Long registrationNumber;
 
-    public Bills(String obligatoryDigits, Long accountNumber, Long registrationNumber){
+    public Bill(String obligatoryDigits, Long accountNumber, Long registrationNumber){
         this.obligatoryDigits = obligatoryDigits;
         this.accountNumber = accountNumber;
         this.registrationNumber = registrationNumber;
     }
 
-    public Bills(String nameOfBill, Double amount, String obligatoryDigits, Long accountNumber, Long registrationNumber) {
+    public Bill(String nameOfBill, Double amount, String obligatoryDigits, Long accountNumber, Long registrationNumber) {
         this.nameOfBill = nameOfBill;
         this.amount = amount;
         this.obligatoryDigits = obligatoryDigits;
@@ -30,7 +27,7 @@ public class Bills {
         this.registrationNumber = registrationNumber;
     }
 
-    public Bills(){}
+    public Bill(){}
 
     public Long getId() {
         return id;

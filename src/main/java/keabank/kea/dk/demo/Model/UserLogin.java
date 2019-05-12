@@ -13,6 +13,7 @@ public class UserLogin {
     private String Cpr;
     private String email;
     private String password;
+    private String sendserviceCode;
     @OneToMany(cascade = {CascadeType.ALL})
     List<Accounts> accountsList;
 
@@ -25,6 +26,15 @@ public class UserLogin {
         this.email = email;
         this.Cpr=Cpr;
         this.password = password;
+        this.accountsList = accountsList;
+    }
+
+    public UserLogin(String fullName, String cpr, String email, String password, String sendserviceCode, List<Accounts> accountsList) {
+        this.fullName = fullName;
+        Cpr = cpr;
+        this.email = email;
+        this.password = password;
+        this.sendserviceCode = sendserviceCode;
         this.accountsList = accountsList;
     }
 
@@ -80,8 +90,14 @@ public class UserLogin {
         Cpr = cpr;
     }
 
-
+    public String getSendserviceCode() {
+        return sendserviceCode;
     }
+
+    public void setSendserviceCode(String sendserviceCode) {
+        this.sendserviceCode = sendserviceCode;
+    }
+}
 
 
 

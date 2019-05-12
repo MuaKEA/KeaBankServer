@@ -1,10 +1,8 @@
 package keabank.kea.dk.demo.Controller;
 
 
-import keabank.kea.dk.demo.Model.Accounts;
-import keabank.kea.dk.demo.Model.TransActions;
-import keabank.kea.dk.demo.Model.TransactionsQuaue;
-import keabank.kea.dk.demo.Model.UserLogin;
+import keabank.kea.dk.demo.Model.*;
+import keabank.kea.dk.demo.Repositories.BillsRepo;
 import keabank.kea.dk.demo.Repositories.ITransactionsQuaue;
 import keabank.kea.dk.demo.Repositories.Iaccountsrepository;
 import keabank.kea.dk.demo.Repositories.UserLoginRepo;
@@ -22,6 +20,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import static keabank.kea.dk.demo.Logic.AgeCalculator.getAge;
 import static keabank.kea.dk.demo.Logic.GenerateRegistrationNumber.getaccountnumber;
 
@@ -30,7 +30,6 @@ import static keabank.kea.dk.demo.Logic.GenerateRegistrationNumber.getaccountnum
 @RestController
 public class SendingAndReceivingController {
     private Long RegistrationNumber = 4444L;
-    private Boolean isautomatictrasactionsrunning;
 
     @Autowired
     UserLoginRepo userLoginRepo;
@@ -38,40 +37,43 @@ public class SendingAndReceivingController {
     ITransactionsQuaue iTransactionsQuaue;
     @Autowired
     Iaccountsrepository iaccountsrepository;
+    @Autowired
+    BillsRepo billsRepo;
+
+
+
 
 
     @PostMapping("/sendmoneyToOtherAccount")
     public ResponseEntity<UserLogin> Sendmoney(@RequestParam(name = "Email") String Email, @RequestParam(name = "TranceActionName") String TranceActionName, @RequestParam(name = "fromAccount") String Faccount, @RequestParam(name = "ToAccount") String toAccount, @RequestParam(name = "value") Double value, @RequestParam(name = "sendingorReciving") boolean sendingorrecing) {
         UserLogin user = userLoginRepo.findByEmail(Email);
-        UserLogin user2 = userLoginRepo.findByEmail(Email);
-        String datenow = " yyyy-MM-dd";
-        String timenow = " HH:mm:ss";
-        SimpleDateFormat simpleDate = new SimpleDateFormat(datenow);
-        SimpleDateFormat simpletime = new SimpleDateFormat(timenow);
-        Date datetime= new Date();
-        String date = simpleDate.format(datetime);
-        String time = simpletime.format(datetime);
+
 
 
         for (int i = 0; i < user.getAccountsList().size(); i++) {
             if (user.getAccountsList().get(i).getAccount().equals(Faccount)) {
-                user.getAccountsList().get(i).getTransActions().add(new TransActions(TranceActionName,value,user.getAccountsList().get(i).getCurrentdeposit(),remowedicimals(user.getAccountsList().get(i).getCurrentdeposit()-value),date,time,sendingorrecing));
+                user.getAccountsList().get(i).getTransActions().add(new TransActions(TranceActionName,value,user.getAccountsList().get(i).getCurrentdeposit(),remowedicimals(user.getAccountsList().get(i).getCurrentdeposit()-value),LocalDate.now(),sendingorrecing));
                 user.getAccountsList().get(i).setCurrentdeposit(remowedicimals(user.getAccountsList().get(i).getCurrentdeposit() - value));
+                userLoginRepo.save(user);
+
             }
+
+            if(user.getAccountsList().get(i).getAccount().equals(toAccount)){
+                user.getAccountsList().get(i).getTransActions().add(new TransActions(TranceActionName,value,user.getAccountsList().get(i).getCurrentdeposit(),remowedicimals(user.getAccountsList().get(i).getCurrentdeposit()+value),LocalDate.now(),false));
+                user.getAccountsList().get(i).setCurrentdeposit(remowedicimals(user.getAccountsList().get(i).getCurrentdeposit()+value));
+                userLoginRepo.save(user);
+
+            }
+
+
         }
 
-            for (int j = 0; j <user2.getAccountsList().size() ; j++) {
-                if(user2.getAccountsList().get(j).getAccount().equals(toAccount)){
-                    user2.getAccountsList().get(j).getTransActions().add(new TransActions(TranceActionName,value,user2.getAccountsList().get(j).getCurrentdeposit(),remowedicimals(user2.getAccountsList().get(j).getCurrentdeposit()+value),date,time,false));
-                    user2.getAccountsList().get(j).setCurrentdeposit(remowedicimals(user.getAccountsList().get(j).getCurrentdeposit()+value));
-                }
-            }
-            userLoginRepo.save(user);
-            userLoginRepo.save(user2);
+
 
             return new ResponseEntity<>(userLoginRepo.findByEmail(Email), HttpStatus.OK);
 
     }
+
 
 
     @GetMapping("/validateAge")
@@ -85,66 +87,55 @@ public class SendingAndReceivingController {
         return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-@PostMapping("/startTransactionsService")
+    @PostMapping("/startTransactions")
     public void startTransactionsService() {
-
-      Thread transacions = new Thread(()->{
-
-
-
-
-
         List<TransactionsQuaue> transQ = iTransactionsQuaue.findByDateBeforeOrDate(LocalDate.now(), LocalDate.now());
-        List<UserLogin> userLoginList = userLoginRepo.findAll();
+
 
         for (int i = 0; i < transQ.size(); i++) {
-            Accounts Fromaccount = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(transQ.get(i).getFromregistrationNumber(), transQ.get(i).getFromaccountNumber());
-            Accounts Toaccount = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(transQ.get(i).getTOgistrationNumber(), transQ.get(i).getTocountNumber());
+            Optional<Accounts> Fromaccount = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(transQ.get(i).getFromregistrationNumber(),transQ.get(i).getFromaccountNumber());
+            Optional<Accounts> Toaccount = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(transQ.get(i).getTOgistrationNumber(), transQ.get(i).getTocountNumber());
+            Optional<Bill> Biltopay = billsRepo.findByRegistrationNumberAndAccountNumber(transQ.get(i).getTOgistrationNumber(), transQ.get(i).getTocountNumber());
 
-            for (int j = 0; j < userLoginList.size(); j++) {
 
-                for (int k = 0; k < userLoginList.get(j).getAccountsList().size(); k++) {
+            if (Fromaccount.isPresent() && Biltopay.isPresent()) {
+                Fromaccount.get().getTransActions().add(new TransActions(Biltopay.get().getNameOfBill(), transQ.get(i).getTransactionAmmount(), Fromaccount.get().getCurrentdeposit(), remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()),transQ.get(i).getDate(), true));
+                Fromaccount.get().setCurrentdeposit(remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()));
+                iaccountsrepository.save(Fromaccount.get());
+                iTransactionsQuaue.delete(transQ.get(i));
 
-                    if (userLoginList.get(j).getAccountsList().get(k).equals(Fromaccount)) {
-                        UserLogin Fromuser = userLoginRepo.findByEmail(userLoginList.get(j).getEmail());
-                        Fromuser.getAccountsList().get(k).getTransActions().add(new TransActions("TO" + Toaccount.getAccount(), transQ.get(i).getTransactionAmmount(), Fromuser.getAccountsList().get(k).getCurrentdeposit(), remowedicimals(Fromuser.getAccountsList().get(k).getCurrentdeposit() - transQ.get(i).getTransactionAmmount()), LocalDate.now().toString(), true));
-                        Fromuser.getAccountsList().get(k).setCurrentdeposit(remowedicimals(Fromuser.getAccountsList().get(k).getCurrentdeposit() - transQ.get(i).getTransactionAmmount()));
+                if (Biltopay.get().getAmount() > transQ.get(i).getTransactionAmmount()) {
+                    Biltopay.get().setAmount(remowedicimals((Biltopay.get().getAmount() - transQ.get(i).getTransactionAmmount() + 100.0)));
+                    Biltopay.get().setNameOfBill(Biltopay.get().getNameOfBill() + "Rykker");
+                    billsRepo.save(Biltopay.get());
 
-                        userLoginRepo.save(Fromuser);
-
-                    }
-                    if (userLoginList.get(j).getAccountsList().get(k).equals(Toaccount)) {
-                        UserLogin TOuser = userLoginRepo.findByEmail(userLoginList.get(j).getEmail());
-                        TOuser.getAccountsList().get(k).getTransActions().add(new TransActions("From" + Fromaccount.getAccount(), transQ.get(i).getTransactionAmmount(), TOuser.getAccountsList().get(k).getCurrentdeposit(), remowedicimals(TOuser.getAccountsList().get(k).getCurrentdeposit() + transQ.get(i).getTransactionAmmount()), LocalDate.now().toString(), false));
-                        TOuser.getAccountsList().get(k).setCurrentdeposit(remowedicimals(TOuser.getAccountsList().get(k).getCurrentdeposit() + transQ.get(i).getTransactionAmmount()));
-                        userLoginRepo.save(TOuser);
-                    }
                 }
-            }
-            iTransactionsQuaue.delete(transQ.get(i));
 
+            }else if (Fromaccount.isPresent() && Toaccount.isPresent()) {
+                Fromaccount.get().getTransActions().add(new TransActions("TO" + Toaccount.get().getAccount(), transQ.get(i).getTransactionAmmount(), Fromaccount.get().getCurrentdeposit(), remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()), transQ.get(i).getDate(), true));
+                Fromaccount.get().setCurrentdeposit(remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()));
+                iaccountsrepository.save(Fromaccount.get());
+                Toaccount.get().getTransActions().add(new TransActions("From" + Fromaccount.get().getAccount(), transQ.get(i).getTransactionAmmount(), Toaccount.get().getCurrentdeposit(), remowedicimals(Toaccount.get().getCurrentdeposit() + transQ.get(i).getTransactionAmmount()), transQ.get(i).getDate(), false));
+                Toaccount.get().setCurrentdeposit(remowedicimals(Toaccount.get().getCurrentdeposit() + transQ.get(i).getTransactionAmmount()));
+                iaccountsrepository.save(Toaccount.get());
+                iTransactionsQuaue.delete(transQ.get(i));
+            }
         }
-          try {
-              System.out.println("before sleep");
-              Thread.sleep(60000);
-              System.out.println("after sleep");
-          } catch (InterruptedException e) {
-              e.printStackTrace();
-          }
-      });
-      transacions.start();
+
 
     }
 
     @PostMapping("/sendtootherusers")
-    public ResponseEntity sendtootherusers(@RequestParam(name = "Email") String email, @RequestParam(name = "Fromaccout") String Fromaccout,@RequestParam(name = "Fromatype") String Fromatype, @RequestParam(name = "reg") Long reg,@RequestParam(name = "accountnb") Long accountnb,@RequestParam(name = "ammount") double ammount){
+    public ResponseEntity sendtootherusers(@RequestParam(name = "Email") String email, @RequestParam(name = "Fromaccout") String Fromaccout,@RequestParam(name = "Fromatype") String Fromatype, @RequestParam(name = "reg") Long reg,@RequestParam(name = "accountnb") Long accountnb,@RequestParam(name = "ammount") double ammount,@RequestParam(name = "servicecode") String servicecode){
         Accounts accounts;
         UserLogin userLogin= userLoginRepo.findByEmail(email);
         for (int i = 0; i <userLogin.getAccountsList().size(); i++) {
 
-            if(userLogin.getAccountsList().get(i).getAccount().equals(Fromaccout) && userLogin.getAccountsList().get(i).getAccounttype().equals(Fromatype)){
+            if(userLogin.getSendserviceCode().equals(servicecode) &&  userLogin.getAccountsList().get(i).getAccount().equals(Fromaccout) && userLogin.getAccountsList().get(i).getAccounttype().equals(Fromatype)){
                 accounts  =userLogin.getAccountsList().get(i);
                 iTransactionsQuaue.save(new TransactionsQuaue("From:" + Fromaccout, accounts.getAccountNumber(), accounts.getregistrationnumber(), accountnb, reg, ammount, LocalDate.now()));
+
+
 
             }
         }
