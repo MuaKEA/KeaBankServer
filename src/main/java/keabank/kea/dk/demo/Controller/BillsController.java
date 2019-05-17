@@ -33,7 +33,6 @@ public class BillsController {
     ITransactionsQuaue iTransactionsQuaue;
 
 
-
     @PostMapping("/checkbillsexist")
     public ResponseEntity getBill(@RequestParam(name = "digits")String obligatoryDigits, @RequestParam(name = "accountnumber") Long accountNumber,
                                   @RequestParam(name = "registrationNumber") Long registrationNumber){
@@ -42,6 +41,7 @@ public class BillsController {
         System.out.println(obligatoryDigits +" " +  accountNumber + " " + "" + registrationNumber);
 
      Optional<Bill> bills=billsRepo.findByObligatoryDigitsAndAccountNumberAndRegistrationNumber( "+"+obligatoryDigits, accountNumber, registrationNumber);
+
 
 
                 if(bills.isPresent()){
@@ -81,12 +81,9 @@ public class BillsController {
                                         @RequestParam(name = "registrationNumber") Long registrationNumber,
                                         @RequestParam(name = "servicecode") String servicecode) {
 
-//11-04-2019
 
-
-
+        System.out.println(date);
         UserLogin userLogin = userLoginRepo.findByEmail(Email);
-
 
         for (int i = 0; i <userLogin.getAccountsList().size() ; i++) {
 
@@ -99,20 +96,18 @@ public class BillsController {
                    for (int j = 1; j <12 ; j++) {
 
                        LocalDate paybillinthefurture = fromthefirstofmonth.plus(j, ChronoUnit.MONTHS);
-                       TransactionsQuaue transactionsQuaue = new TransactionsQuaue(TranceActionName, userLogin.getAccountsList().get(i).getAccountNumber(), userLogin.getAccountsList().get(i).getregistrationnumber(), accountnumber, registrationNumber, value,paybillinthefurture );
+                       TransactionsQuaue transactionsQuaue = new TransactionsQuaue(TranceActionName,"" ,userLogin.getAccountsList().get(i).getAccountNumber(), userLogin.getAccountsList().get(i).getregistrationnumber(), accountnumber, registrationNumber, value,paybillinthefurture );
                        iTransactionsQuaue.save(transactionsQuaue);
                    }
                }
-               TransactionsQuaue transactionsQuaue = new TransactionsQuaue(TranceActionName, userLogin.getAccountsList().get(i).getAccountNumber(), userLogin.getAccountsList().get(i).getregistrationnumber(), accountnumber, registrationNumber, value, returnformateddate(date));
+               TransactionsQuaue transactionsQuaue = new TransactionsQuaue(TranceActionName,"", userLogin.getAccountsList().get(i).getAccountNumber(), userLogin.getAccountsList().get(i).getregistrationnumber(), accountnumber, registrationNumber, value, returnformateddate(date));
                 iTransactionsQuaue.save(transactionsQuaue);
 
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }
-
-     return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
-
 
 
     public LocalDate returnformateddate(String date){

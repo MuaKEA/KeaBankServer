@@ -12,6 +12,7 @@ public class TransactionsQuaue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String transactionName;
+    private String texttoReciever;
     private Long FromaccountNumber;
     private Long FromregistrationNumber;
     private Long TocountNumber;
@@ -24,8 +25,9 @@ public class TransactionsQuaue {
 
     }
 
-    public TransactionsQuaue(String transactionName, Long fromaccountNumber, Long fromregistrationNumber, Long tocountNumber, Long TOgistrationNumber, double transactionAmmount, LocalDate date) {
+    public TransactionsQuaue(String transactionName,String texttoReciever ,Long fromaccountNumber, Long fromregistrationNumber, Long tocountNumber, Long TOgistrationNumber, double transactionAmmount, LocalDate date) {
         this.transactionName = transactionName;
+        this.texttoReciever = texttoReciever;
         this.FromaccountNumber = fromaccountNumber;
         this.FromregistrationNumber = fromregistrationNumber;
         this.TocountNumber = tocountNumber;
@@ -97,5 +99,13 @@ public class TransactionsQuaue {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getTexttoReciever() {
+        return texttoReciever;
+    }
+
+    public void setTexttoReciever(String texttoReciever) {
+        this.texttoReciever = texttoReciever;
     }
 }

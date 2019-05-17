@@ -2,10 +2,16 @@ package keabank.kea.dk.demo.Logic;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.File;
 
 @Service
 public class Mailservice {
@@ -21,12 +27,23 @@ public class Mailservice {
 
 public void sendemail(String email,String message) throws MailException {
 Thread t= new Thread(()-> {
-    SimpleMailMessage mail = new SimpleMailMessage();
-    mail.setTo(email);
-    mail.setFrom("altair2400@gmail.com");
-    mail.setSubject("From Kea Bank");
-    mail.setText(message);
-    javaMailSender.send(mail);
+
+    MimeMessage messagetoclient = javaMailSender.createMimeMessage();
+
+
+    try {
+        MimeMessageHelper helper = new MimeMessageHelper(messagetoclient,true);
+        helper.setTo(email);
+        helper.setFrom("Kea.online@outlook.com");
+        helper.setSubject("From keaBank:");
+        helper.setText(message);
+        javaMailSender.send(messagetoclient);
+
+    } catch (MessagingException e) {
+        e.printStackTrace();
+    }
+
+
 
 });
 t.start();

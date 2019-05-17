@@ -12,7 +12,7 @@ public interface UserLoginRepo extends CrudRepository<UserLogin,Long> {
     UserLogin findByEmail(String Email);
     List<UserLogin> findAll();
 
-
+    Optional<UserLogin> findByEmailAndSendserviceCode(String Email,String servicecode);
 
 
 }

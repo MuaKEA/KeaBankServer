@@ -68,10 +68,23 @@ public class UserLoginController {
     }
 
 
+
+    @PostMapping("accountchecker")
+    public ResponseEntity accountchecker(@RequestParam(name = "reg") Long reg,@RequestParam(name = "accountnumber") Long accountnumber){
+
+        Optional<Accounts> account = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(reg,accountnumber);
+
+        if (account.isPresent()){
+
+            return new ResponseEntity(HttpStatus.OK);
+
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
     @PostMapping("/loginvalidation")
     public ResponseEntity uservalidation(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
         Optional<UserLogin> user = userLoginRepo.findByEmailAndPassword(username, password);
-        System.out.println(user.isPresent());
 
         if (user.isPresent()) {
 

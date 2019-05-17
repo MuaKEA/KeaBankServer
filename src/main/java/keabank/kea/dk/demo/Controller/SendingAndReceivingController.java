@@ -1,6 +1,7 @@
 package keabank.kea.dk.demo.Controller;
 
 
+import com.sun.org.apache.regexp.internal.RE;
 import keabank.kea.dk.demo.Model.*;
 import keabank.kea.dk.demo.Repositories.BillsRepo;
 import keabank.kea.dk.demo.Repositories.ITransactionsQuaue;
@@ -9,6 +10,8 @@ import keabank.kea.dk.demo.Repositories.UserLoginRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,8 +42,6 @@ public class SendingAndReceivingController {
     Iaccountsrepository iaccountsrepository;
     @Autowired
     BillsRepo billsRepo;
-
-
 
 
 
@@ -77,7 +78,7 @@ public class SendingAndReceivingController {
 
 
     @GetMapping("/validateAge")
- public ResponseEntity getCostumerAge(@RequestParam(name = "Email") String Email) {
+    public ResponseEntity getCostumerAge(@RequestParam(name = "Email") String Email) {
         UserLogin userLogin = userLoginRepo.findByEmail(Email);
 
         if (getAge(userLogin.getCpr()) >= 77) {
@@ -87,19 +88,31 @@ public class SendingAndReceivingController {
         return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping("/startTransactions")
-    public void startTransactionsService() {
-        List<TransactionsQuaue> transQ = iTransactionsQuaue.findByDateBeforeOrDate(LocalDate.now(), LocalDate.now());
+    @PostMapping("/transaction")
+    public void startTransactionsService(@RequestParam(name = "transationname") String transationname,
+                                         @RequestParam(name = "text",defaultValue = "")String text,
+                                         @RequestParam(name = "Freg") Long Freg,
+                                         @RequestParam(name = "FaccN") Long FaccN,
+                                         @RequestParam(name = "TaccN") Long TaccN,
+                                         @RequestParam(name = "Treg") Long Treg,
+                                         @RequestParam(name = "amount") double ammount){
 
+        TransactionsQuaue transactionsQuaue =  new TransactionsQuaue(transationname,text,FaccN,Freg,TaccN,Treg,ammount,LocalDate.now());
+        iTransactionsQuaue.save(transactionsQuaue);
+        List<TransactionsQuaue> transQ = iTransactionsQuaue.findByDateBeforeOrDate(LocalDate.now(), LocalDate.now());
 
         for (int i = 0; i < transQ.size(); i++) {
             Optional<Accounts> Fromaccount = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(transQ.get(i).getFromregistrationNumber(),transQ.get(i).getFromaccountNumber());
             Optional<Accounts> Toaccount = iaccountsrepository.findAllByRegistrationnumberAndAccountNumber(transQ.get(i).getTOgistrationNumber(), transQ.get(i).getTocountNumber());
             Optional<Bill> Biltopay = billsRepo.findByRegistrationNumberAndAccountNumber(transQ.get(i).getTOgistrationNumber(), transQ.get(i).getTocountNumber());
 
+            Toaccount.ifPresent(System.out::println);
+            Fromaccount.ifPresent(System.out::println);
+
 
             if (Fromaccount.isPresent() && Biltopay.isPresent()) {
-                Fromaccount.get().getTransActions().add(new TransActions(Biltopay.get().getNameOfBill(), transQ.get(i).getTransactionAmmount(), Fromaccount.get().getCurrentdeposit(), remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()),transQ.get(i).getDate(), true));
+
+                Fromaccount.get().getTransActions().add(new TransActions(Biltopay.get().getNameOfBill(),"Message:" + transQ.get(i).getTexttoReciever(), transQ.get(i).getTransactionAmmount(), Fromaccount.get().getCurrentdeposit(), remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()),transQ.get(i).getDate(), true));
                 Fromaccount.get().setCurrentdeposit(remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()));
                 iaccountsrepository.save(Fromaccount.get());
                 iTransactionsQuaue.delete(transQ.get(i));
@@ -112,19 +125,21 @@ public class SendingAndReceivingController {
                 }
 
             }else if (Fromaccount.isPresent() && Toaccount.isPresent()) {
-                Fromaccount.get().getTransActions().add(new TransActions("TO" + Toaccount.get().getAccount(), transQ.get(i).getTransactionAmmount(), Fromaccount.get().getCurrentdeposit(), remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()), transQ.get(i).getDate(), true));
+
+                Fromaccount.get().getTransActions().add(new TransActions("TO" + Toaccount.get().getAccount(),"Message:" + transQ.get(i).getTexttoReciever(), transQ.get(i).getTransactionAmmount(), Fromaccount.get().getCurrentdeposit(), remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()), transQ.get(i).getDate(), true));
                 Fromaccount.get().setCurrentdeposit(remowedicimals(Fromaccount.get().getCurrentdeposit() - transQ.get(i).getTransactionAmmount()));
                 iaccountsrepository.save(Fromaccount.get());
-                Toaccount.get().getTransActions().add(new TransActions("From" + Fromaccount.get().getAccount(), transQ.get(i).getTransactionAmmount(), Toaccount.get().getCurrentdeposit(), remowedicimals(Toaccount.get().getCurrentdeposit() + transQ.get(i).getTransactionAmmount()), transQ.get(i).getDate(), false));
+                Toaccount.get().getTransActions().add(new TransActions("From" + Fromaccount.get().getAccount(),"Message:" + transQ.get(i).getTexttoReciever(), transQ.get(i).getTransactionAmmount(), Toaccount.get().getCurrentdeposit(), remowedicimals(Toaccount.get().getCurrentdeposit() + transQ.get(i).getTransactionAmmount()), transQ.get(i).getDate(), false));
                 Toaccount.get().setCurrentdeposit(remowedicimals(Toaccount.get().getCurrentdeposit() + transQ.get(i).getTransactionAmmount()));
                 iaccountsrepository.save(Toaccount.get());
                 iTransactionsQuaue.delete(transQ.get(i));
+
+
             }
         }
 
 
     }
-
     @PostMapping("/sendtootherusers")
     public ResponseEntity sendtootherusers(@RequestParam(name = "Email") String email, @RequestParam(name = "Fromaccout") String Fromaccout,@RequestParam(name = "Fromatype") String Fromatype, @RequestParam(name = "reg") Long reg,@RequestParam(name = "accountnb") Long accountnb,@RequestParam(name = "ammount") double ammount,@RequestParam(name = "servicecode") String servicecode){
         Accounts accounts;
@@ -133,15 +148,12 @@ public class SendingAndReceivingController {
 
             if(userLogin.getSendserviceCode().equals(servicecode) &&  userLogin.getAccountsList().get(i).getAccount().equals(Fromaccout) && userLogin.getAccountsList().get(i).getAccounttype().equals(Fromatype)){
                 accounts  =userLogin.getAccountsList().get(i);
-                iTransactionsQuaue.save(new TransactionsQuaue("From:" + Fromaccout, accounts.getAccountNumber(), accounts.getregistrationnumber(), accountnb, reg, ammount, LocalDate.now()));
-
-
+                iTransactionsQuaue.save(new TransactionsQuaue("From:" + Fromaccout,"", accounts.getAccountNumber(), accounts.getregistrationnumber(), accountnb, reg, ammount, LocalDate.now()));
 
             }
         }
         return new ResponseEntity(HttpStatus.OK);
     }
-
 
 
 
@@ -225,11 +237,10 @@ public class SendingAndReceivingController {
         for (int i = 1; i < 12; i++) {
             LocalDate weeaks = today.plus(i, ChronoUnit.WEEKS);
             System.out.println(weeaks + " weeks");
-            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(), From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
+            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(),"", From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
         }
 
     }
-
 
     private void automatedmounth(@RequestParam(name = "ammount") double ammount, Accounts From, Accounts TO) {
 
@@ -241,7 +252,7 @@ public class SendingAndReceivingController {
         for (int i = 1; i < 12; i++) {
             LocalDate weeaks = today.plus(i, ChronoUnit.MONTHS);
             System.out.println(weeaks + " months");
-            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(), From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
+            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(),"", From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
         }
 
 
@@ -256,10 +267,9 @@ public class SendingAndReceivingController {
             LocalDate weeaks = today.plus(i, ChronoUnit.DAYS);
             System.out.println(weeaks + " days");
 
-            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(), From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
+            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(),"",From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
         }
     }
-
 
     private void automatedyears(@RequestParam(name = "ammount") double ammount, Accounts From, Accounts TO) {
 
@@ -270,14 +280,14 @@ public class SendingAndReceivingController {
 
             LocalDate weeaks = today.plus(i, ChronoUnit.YEARS);
             System.out.println(weeaks.toString());
-            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(), From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
+            iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(),"", From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, weeaks));
         }
     }
 
     private void paydate(@RequestParam(name = "ammount") double ammount, Accounts From, Accounts TO, LocalDate localDate) {
 
 
-        iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(), From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, localDate));
+        iTransactionsQuaue.save(new TransactionsQuaue("From:" + From.getAccount(),"",From.getAccountNumber(), From.getregistrationnumber(), TO.getAccountNumber(), TO.getregistrationnumber(), ammount, localDate));
 
     }
 
@@ -287,6 +297,11 @@ public class SendingAndReceivingController {
 
         return new ResponseEntity<>(userLogin,HttpStatus.OK);
 }
+
+
+
+
+
 
     private double remowedicimals(double amount){
         double generated=Double.valueOf(String.valueOf(new DecimalFormat("#.##").format(amount)).replace(",","."));
